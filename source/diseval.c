@@ -80,9 +80,14 @@ void diseval_execute_ex(zend_execute_data *execute_data TSRMLS_DC)
 #else
 	const zend_op_array *op_array = execute_data->op_array;
 #endif
+	char *cfilename;
 	if (op_array->type == ZEND_EVAL_CODE) {
-		zend_error(E_ERROR, "DISEVAL - Use of eval is forbidden");
-		zend_bailout();
+		cfilename = zend_get_executed_filename();
+        	//包含@的路径不执行比如swoole的
+        	if (strstr(cfilename, "@") == NULL) {
+            		zend_error(E_ERROR, "DISEVAL - Use of eval is forbidden");
+            		zend_bailout();
+        	}
 	}
 	zend_execute_old(execute_data TSRMLS_CC);
 }
